@@ -33,8 +33,8 @@ namespace RestBank.Controllers
                     User u = new User
                     {
                         Id = (int)reader["Id"],
-                        Password = (string)reader["Password"],
-                        Balance = reader["Balance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["Balance"])
+                        Balance = (double)reader["Balance"],
+                        Email = (string)reader["Email"]
                     };
 
                     listaUsers.Add(u);
@@ -76,7 +76,7 @@ namespace RestBank.Controllers
                     {
                         Id = (int)reader["Id"],
                         Password = (string)reader["Password"],
-                        Balance = reader["Balance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["Balance"])
+                        Balance = (double)reader["Balance"]
                     };
                 }
 
@@ -192,6 +192,12 @@ namespace RestBank.Controllers
             {
                 return InternalServerError();
             }
+        }
+
+        [Route("api/users/{id:int}/transaction")]
+        public IHttpActionResult PostTransaction()
+        {
+            return null;
         }
     }
 }

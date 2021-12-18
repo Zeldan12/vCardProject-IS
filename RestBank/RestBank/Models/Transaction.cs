@@ -5,12 +5,10 @@ using System.Web;
 
 namespace RestBank.Models
 {
-    public class User
+    public class Transaction
     {
-        public int Id { get; set; }
+        public string DestinationEmail { get; set; }
+        public double Ammount { get; set; }
         public string Password { get; set; }
-        public double Balance { get; set; }
-        public string Email { get; set; }
-
     }
 }

@@ -3,65 +3,62 @@ using System.Collections.Generic;
 using System.Web.Http;
 using vCardGateway.Models;
 using vCardGateway.Logic;
-using Newtonsoft.Json.Linq;
+
 
 namespace vCardGateway.Controllers
 {
     public class VCardsController : ApiController
     {
-        public IEnumerable<VCard> Get(JObject data, int userId)
+
+        [Route("api/vcards")]
+        [UserAuthentication]
+        public IEnumerable<VCard> Get()
         {
             SQLVCardsHandler handler = null;
-            List<VCard> lista = new List<VCard>();
-
-            if (data == null || data["password"] == null || data["name"] == null)
-            {
-                return lista;
-            }
 
             try
             {
-                User user = handler.authenticate(data["name"].ToString(), data["password"].ToString());
-                if (user == null || user.type != UserType.Administrator)
-                {
-                    return lista;
-                }
+                int id = int.Parse(RequestContext.Principal.Identity.Name);
+                string type = RequestContext.Principal.Identity.AuthenticationType;
 
                 handler = new SQLVCardsHandler();
+                if (type != "Admin")
+                {
+                    return handler.getAllVCards(id);
+                }
+
+                
                 return handler.getAllVCards();
             }
             catch (Exception e)
             {
-                return lista;
+                return new List<VCard>();
             }
         }
-
+        
+        [UserAuthentication]
         [Route("api/vcards/{number}")]
-        public IHttpActionResult GetVCard(JObject data, int number)
+        public IHttpActionResult GetVCard(int number)
         {
             SQLVCardsHandler handler = null;
 
-            if (data == null || data["password"] == null || data["name"] == null)
-            {
-                return BadRequest();
-            }
-
             try
             {
-                handler = new SQLVCardsHandler();
-                User user = handler.authenticate(data["name"].ToString(), data["password"].ToString());
+                int id = int.Parse(RequestContext.Principal.Identity.Name);
+                string type = RequestContext.Principal.Identity.AuthenticationType;
 
-                if (user == null)
-                {
-                    return BadRequest("Authentication incorrect");
-                }
+                handler = new SQLVCardsHandler();
 
                 VCard vCard = handler.getVCard(number);
 
-                if (vCard == null || user.id == vCard.ownerId)
+                if (vCard == null)
                 {
                     return NotFound();
                 }
+                if (type != "Admin" || id != vCard.ownerId)
+                {
+                    return Unauthorized();
+                }          
 
                 return Ok(vCard);
             }
@@ -71,35 +68,28 @@ namespace vCardGateway.Controllers
             }
         }
 
-        public IHttpActionResult Post(JObject data)
+        [UserAuthentication]
+        [Route("api/vcards")]
+        public IHttpActionResult Post([FromBody]VCard vCard)
         {
-
             SQLVCardsHandler handler = null;
-            if (data == null || data["password"] == null || data["phoneNumber"] == null || data["name"] == null)
-            {
-                return BadRequest();
-
-            }
             try
             {
+                int id = int.Parse(RequestContext.Principal.Identity.Name);
+                string type = RequestContext.Principal.Identity.AuthenticationType;
+
                 handler = new SQLVCardsHandler();
-                User user = handler.authenticate(data["name"].ToString(), data["password"].ToString());
-                if ( user == null)
-                {
-                    return BadRequest("Authentication incorrect");
-                }
-                
-                int phoneNumber = IsNumberValid(data["phoneNumber"].ToString());
-                if (phoneNumber == -1)
+
+                if (IsNumberValid(vCard.phoneNumber))
                 {
                     return BadRequest("Number is Invalid!");
                 }
-             
-                VCard result = handler.createVcard(phoneNumber, user.id);
+
+                VCard result = handler.createVcard(vCard.phoneNumber, id);
 
                 if (result != null)
                 {
-                    return Created("api/users/6/vcards"+phoneNumber,result);
+                    return Created("api/vcards/"+ vCard.phoneNumber, result);
                 }
                 else
                 {
@@ -113,79 +103,34 @@ namespace vCardGateway.Controllers
             
         }
 
-        public IHttpActionResult Put(JObject data)
-        {
-
-            SQLVCardsHandler handler = null;
-            if (data == null || data["password"] == null || data["phoneNumber"] == null || data["name"] == null)
-            {
-                return BadRequest();
-            }
-            try
-            {
-                handler = new SQLVCardsHandler();
-                User user = handler.authenticate(data["name"].ToString(), data["password"].ToString());
-                if (user == null)
-                {
-                    return BadRequest("Authentication incorrect");
-                }
-
-                int phoneNumber = IsNumberValid(data["phoneNumber"].ToString());
-                if (phoneNumber == -1)
-                {
-                    return BadRequest("Number is Invalid!");
-                }
-
-                VCard result = handler.createVcard(phoneNumber, user.id);
-
-                if (result != null)
-                {
-                    return Created("api/users/6/vcards" + phoneNumber, result);
-                }
-                else
-                {
-                    return InternalServerError();
-                }
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-        }
-
+        [UserAuthentication]
         [Route("api/vcards/{number}")]
-        public IHttpActionResult Delete(JObject data,int number)
+        public IHttpActionResult Delete([FromBody] int confirmationCode, int number)
         {
 
             SQLVCardsHandler handler = null;
-            if (data == null || data["password"] == null || data["name"] == null || data["confirmationCode"] == null)
-            {
-                return BadRequest();
-
-            }
             try
             {
+                int id = int.Parse(RequestContext.Principal.Identity.Name);
+                string type = RequestContext.Principal.Identity.AuthenticationType;
+
                 handler = new SQLVCardsHandler();
-                User user = handler.authenticate(data["name"].ToString(), data["password"].ToString());
 
-                if (user == null)
-                {
-                    return BadRequest("Authentication incorrect");
-                }
-
-                int phoneNumber = IsNumberValid(number.ToString());
-
-                if (phoneNumber == -1)
+                if (IsNumberValid(number))
                 {
                     return BadRequest("Number is Invalid!");
                 }
 
-                VCard vCard = handler.getVCard(phoneNumber);
+                VCard vCard = handler.getVCard(number);
 
-                if (vCard == null || user.id == vCard.ownerId)
+                if (vCard == null)
                 {
-                    return NotFound();  
+                    return NotFound();
+                }
+
+                if (id == vCard.ownerId)
+                {
+                    return Unauthorized();
                 }
 
                 if (vCard.balance != 0)
@@ -193,7 +138,7 @@ namespace vCardGateway.Controllers
                     return Conflict();
                 }
 
-                bool result = handler.deleteVcard(phoneNumber);
+                bool result = handler.deleteVcard(number);
 
                 if (result)
                 {
@@ -212,21 +157,17 @@ namespace vCardGateway.Controllers
 
         }
 
-        private int IsNumberValid(string number)
+        private bool IsNumberValid(int number)
         {
-            if (!Int32.TryParse(number, out int phoneNumber))
+            if (number.ToString().Length != 9)
             {
-                return -1;
+                return false;
             }
-            if (number.Length != 9)
+            if (number.ToString().StartsWith("9"))
             {
-                return -1;
+                return false;
             }
-            if (!number.StartsWith("9"))
-            {
-                return -1;
-            }
-            return phoneNumber;
+            return true;
         }
     }
 }

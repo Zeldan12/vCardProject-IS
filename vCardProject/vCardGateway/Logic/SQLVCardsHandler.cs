@@ -61,7 +61,7 @@ namespace vCardGateway.Logic
                 if (connection.State == System.Data.ConnectionState.Open) connection.Close();
             }
         }
-
+       
         public bool deleteVcard(int number)
         {
             SqlConnection connection = null;
@@ -90,45 +90,6 @@ namespace vCardGateway.Logic
             {
                 if (connection.State == System.Data.ConnectionState.Open) connection.Close();
                 throw new Exception(e.Message);
-            }
-        }
-
-        public User authenticate(string name, string password)
-        {
-            SqlConnection connection = null;
-
-            try
-            {
-                connection = new SqlConnection(connectionString);
-                connection.Open();
-                string sql = "SELECT u.id AS id, u.Password AS password, t.Name AS type FROM USERS u JOIN USERTYPE t ON u.UserTypeID = t.Id WHERE u.name = @name";
-                SqlCommand command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@name", name);
-                SqlDataReader reader = command.ExecuteReader();    
-
-                if (reader.Read())
-                {
-                        if ((string)reader["password"] == password)
-                        {
-                            return new User {
-                                id = (int)reader["id"],
-                                name = name,
-                                type = (UserType)Enum.Parse(typeof(UserType), (string)reader["type"]),
-
-                            };
-                        }
-                }
-                return null;
-                
-            }
-            catch (Exception e)
-            {
-                if (connection.State == System.Data.ConnectionState.Open) connection.Close();
-                throw new Exception(e.Message);
-            }
-            finally
-            {
-                if (connection.State == System.Data.ConnectionState.Open) connection.Close();
             }
         }
 
@@ -250,7 +211,5 @@ namespace vCardGateway.Logic
 
             return lista;
         }
-
-        
     }
 }

@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace vCardGateway.Models
+namespace vCardGateway.Logic
 {
-    public enum UserType
+    public class SQLTransactionHandler
     {
-        Administrator,
-        User
     }
 }
