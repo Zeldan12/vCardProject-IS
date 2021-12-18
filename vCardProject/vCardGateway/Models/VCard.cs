@@ -12,5 +12,14 @@ namespace vCardGateway.Models
         public List<Transaction> Transactions { get; set; }
         public int ownerId { get; set; }
         public float maximumLimit { get; set; }
+
+        public bool checkPhoneNumber()
+        {
+            if (999999999 <= phoneNumber || phoneNumber > 900000000)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
