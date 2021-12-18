@@ -10,6 +10,7 @@ namespace vCardGateway.Controllers
     public class VCardsController : ApiController
     {
 
+        ///
         [Route("api/vcards")]
         [UserAuthentication]
         public IEnumerable<VCard> Get()
@@ -36,6 +37,11 @@ namespace vCardGateway.Controllers
             }
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/vcards/{number}")]
         public IHttpActionResult GetVCard(int number)
@@ -68,6 +74,11 @@ namespace vCardGateway.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vCard"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/vcards")]
         public IHttpActionResult Post([FromBody]VCard vCard)
@@ -103,6 +114,12 @@ namespace vCardGateway.Controllers
             
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="confirmationCode"></param>
+        /// <param name="number"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/vcards/{number}")]
         public IHttpActionResult Delete([FromBody] int confirmationCode, int number)

@@ -7,6 +7,10 @@ namespace vCardGateway.Controllers
 {
     public class BanksController : ApiController
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [Route("api/banks")]
         [UserAuthentication]
         public IEnumerable<BankEntity> Get()
@@ -31,7 +35,11 @@ namespace vCardGateway.Controllers
                 return new List<BankEntity>();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/banks/{id}")]
         public IHttpActionResult GetBank(int id)
@@ -58,7 +66,11 @@ namespace vCardGateway.Controllers
                 return NotFound();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <returns></returns>
         [HttpPost]
         [UserAuthentication]
         [Route("api/banks")]
@@ -99,7 +111,12 @@ namespace vCardGateway.Controllers
             }
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="bank"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/banks/{id}")]
         public IHttpActionResult Put(int id, [FromBody] BankEntity bank)

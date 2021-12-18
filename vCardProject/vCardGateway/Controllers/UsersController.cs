@@ -7,7 +7,10 @@ using vCardGateway.Models;
 namespace vCardGateway.Controllers
 {
     public class UsersController : ApiController
-    {
+    {/// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
         // GET: api/Users
         [UserAuthentication]
         public IEnumerable<User> Get()
@@ -33,7 +36,11 @@ namespace vCardGateway.Controllers
                 return new List<User>();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: api/Users/5
         [UserAuthentication]
         public IHttpActionResult Get(int id)
@@ -65,7 +72,10 @@ namespace vCardGateway.Controllers
             }
             
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/users/me")]
         public IHttpActionResult GetMe()
@@ -75,7 +85,11 @@ namespace vCardGateway.Controllers
         }
 
         // POST: api/Users
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public IHttpActionResult Post([FromBody] User user)
         {
             SQLUsersHandler handler = null;
@@ -105,7 +119,11 @@ namespace vCardGateway.Controllers
             }
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/users/me")]
         public IHttpActionResult PutMe([FromBody]User user)
@@ -113,7 +131,12 @@ namespace vCardGateway.Controllers
             int authId = int.Parse(RequestContext.Principal.Identity.Name);
             return Put(authId, user);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
         // PUT: api/Users/5
         [UserAuthentication]
         public IHttpActionResult Put(int id,[FromBody] User user)
@@ -164,7 +187,11 @@ namespace vCardGateway.Controllers
                 return InternalServerError(e);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/users/me/password")]
         public IHttpActionResult PutMePassword([FromBody] string newPassword)
@@ -172,7 +199,12 @@ namespace vCardGateway.Controllers
             int authId = int.Parse(RequestContext.Principal.Identity.Name);
             return PutPassword(authId, newPassword);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
         [Route("api/users/{int}/password")]
         [UserAuthentication]
         public IHttpActionResult PutPassword(int id, [FromBody] string newPassword)
@@ -203,7 +235,11 @@ namespace vCardGateway.Controllers
                 return InternalServerError(e);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newCode"></param>
+        /// <returns></returns>
         [UserAuthentication]
         [Route("api/users/me/code")]
         public IHttpActionResult PutMeCode([FromBody] int newCode)
@@ -211,7 +247,12 @@ namespace vCardGateway.Controllers
             int authId = int.Parse(RequestContext.Principal.Identity.Name);
             return PutCode(authId, newCode);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="newCode"></param>
+        /// <returns></returns>
         [Route("api/users/{int}/code")]
         [UserAuthentication]
         public IHttpActionResult PutCode(int id, [FromBody] int newCode)
